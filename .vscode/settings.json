@@ -1,0 +1,24 @@
+{
+  "css.lint.unknownAtRules": "ignore",
+  "css.lint.compatibleVendorPrefixes": "ignore",
+  "css.lint.unknownVendorSpecificProperties": "ignore",
+  "css.lint.unknownProperties": "ignore",
+  "css.lint.validProperties": "ignore",
+  "css.validate": false,
+  "scss.validate": false,
+  "less.validate": false,
+  "css.customData": [".vscode/css_custom_data.json"],
+  "css.languageserver.experimental.customData": true,
+  "css.languageserver.experimental.enable": false,
+  "css.languageserver.diagnostics.enable": false,
+  "eslint.ignorePatterns": [
+    "**/build/**",
+    "**/dist/**",
+    "**/node_modules/**",
+    "**/*.min.js",
+    "**/*.bundle.js"
+  ],
+  "files.exclude": {
+    "**/build": false
+  }
+}

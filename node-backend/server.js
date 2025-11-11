@@ -1,0 +1,168 @@
+/**
+ * Ara's Llanta's Tire Shop - Express.js Backend Server
+ *
+ * This server provides API endpoints for:
+ * - Tire catalog management (browse, filter, search)
+ * - Contact form handling
+ * - Health monitoring
+ *
+ * Features:
+ * - Security middleware (Helmet, CORS, rate limiting)
+ * - Database integration with graceful fallback
+ * - Production-ready error handling
+ * - Comprehensive logging
+ */
+
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const path = require('path');
+require('dotenv').config();
+
+// Initialize Express application
+const app = express();
+const PORT = process.env.PORT || 8001;
+
+console.log("🚀 Starting Ara's Llanta's API Server...");
+console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+console.log(`🔌 Port: ${PORT}`);
+
+// ========================================
+// SECURITY MIDDLEWARE
+// ========================================
+
+// Helmet: Sets various HTTP headers for security
+app.use(helmet());
+
+// Rate limiting: Prevents abuse by limiting requests per IP
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+});
+app.use(limiter);
+
+// CORS: Configure cross-origin resource sharing
+const corsOptions = {
+  origin: process.env.CORS_ORIGINS
+    ? process.env.CORS_ORIGINS.split(',')
+    : ['http://localhost:3000'],
+  credentials: true, // Allow cookies and authorization headers
+};
+app.use(cors(corsOptions));
+
+// ========================================
+// BODY PARSING MIDDLEWARE
+// ========================================
+
+// Parse JSON bodies (for API requests)
+app.use(express.json());
+
+// Parse URL-encoded bodies (for form submissions)
+app.use(express.urlencoded({ extended: true }));
+
+// ========================================
+// STATIC FILE SERVING
+// ========================================
+
+// Serve static files from the React frontend build directory
+const frontendPath = path.join(__dirname, '../frontend/build');
+app.use(express.static(frontendPath));
+
+// ========================================
+// ROUTES
+// ========================================
+
+// Import route modules
+const tireRoutes = require('./routes/tires');
+const contactRoutes = require('./routes/contact');
+const newsletterRoutes = require('./routes/newsletter');
+
+// Mount routes with /api prefix
+app.use('/api', tireRoutes); // Tire catalog endpoints
+app.use('/api', contactRoutes); // Contact form endpoints
+app.use('/api', newsletterRoutes); // Newsletter subscription endpoints
+
+// ========================================
+// API ENDPOINTS
+// ========================================
+
+/**
+ * Health Check Endpoint
+ * GET /api/health
+ *
+ * Returns server status and basic information
+ * Used for monitoring and load balancer health checks
+ */
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development',
+  });
+});
+
+/**
+ * API Root Endpoint
+ * GET /api
+ *
+ * Returns basic API information
+ */
+app.get('/api', (req, res) => {
+  res.json({ message: "Ara's Llanta's API" });
+});
+
+// ========================================
+// FRONTEND ROUTING
+// ========================================
+
+/**
+ * Frontend Route Handler
+ * Serves the React app for all non-API routes
+ * This must come after API routes to avoid conflicts
+ */
+app.get('*', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'index.html'));
+});
+
+// ========================================
+// ERROR HANDLING MIDDLEWARE
+// ========================================
+
+/**
+ * 404 Handler
+ * Catches all unmatched routes and returns 404 error
+ */
+app.use('*', (req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
+
+/**
+ * Global Error Handler
+ * Catches all unhandled errors and returns 500 error
+ * Logs error details for debugging
+ */
+app.use((err, req, res, _next) => {
+  console.error('Global error:', err.message);
+  res.status(500).json({ error: 'Something went wrong!' });
+});
+
+// ========================================
+// SERVER STARTUP
+// ========================================
+
+/**
+ * Start server only if this file is run directly
+ * This allows the app to be imported for testing
+ */
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`Frontend: http://localhost:${PORT}`);
+    console.log(`API: http://localhost:${PORT}/api`);
+  });
+}
+
+// Export app for testing and external use
+module.exports = app;

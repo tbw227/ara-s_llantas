@@ -1,0 +1,46 @@
+{
+  "name": "aras-llantas-monorepo",
+  "version": "1.0.0",
+  "description": "Ara's Llantas Tire Shop - Full Stack Application",
+  "private": true,
+  "scripts": {
+    "test": "node test-runner.js",
+    "test:backend": "cd node-backend && npm test",
+    "test:frontend": "cd frontend && npm test -- --watchAll=false",
+    "test:coverage": "node test-runner.js",
+    "test:watch": "cd frontend && npm test",
+    "start": "concurrently \"cd node-backend && npm start\" \"cd frontend && npm start\"",
+    "start:backend": "cd node-backend && npm start",
+    "start:frontend": "cd frontend && npm start",
+    "dev": "concurrently \"cd node-backend && npm run dev\" \"cd frontend && npm start\"",
+    "build": "cd frontend && npm run build",
+    "lint": "cd node-backend && npm run lint && cd ../frontend && npm run lint",
+    "lint:fix": "cd node-backend && npm run lint:fix && cd ../frontend && npm run lint:fix",
+    "format": "cd node-backend && npm run format",
+    "install:all": "npm install && cd node-backend && npm install && cd ../frontend && npm install",
+    "clean": "rm -rf node-backend/node_modules frontend/node_modules node_modules",
+    "setup": "npm run install:all && npm run test"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "workspaces": [
+    "node-backend",
+    "frontend"
+  ],
+  "keywords": [
+    "tires",
+    "ecommerce",
+    "react",
+    "express",
+    "nodejs",
+    "tailwindcss"
+  ],
+  "author": "Ara's Llantas",
+  "license": "MIT"
+}
+
+
+
+
+

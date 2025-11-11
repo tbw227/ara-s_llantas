@@ -1,0 +1,16 @@
+{
+  "version": 1.1,
+  "properties": [
+    {
+      "name": "-webkit-text-size-adjust",
+      "description": "Controls the text inflation algorithm used on some smartphones and tablets. Supported in Safari, Chrome, and Edge.",
+      "browsers": ["S", "C", "E", "FF"]
+    },
+    {
+      "name": "text-size-adjust",
+      "description": "Controls the text inflation algorithm used on some smartphones and tablets. Standard property supported in Chrome 54+, Edge 79+, and Samsung Internet 6.0+.",
+      "browsers": ["C", "E", "S"]
+    }
+  ]
+}
+
