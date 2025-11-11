@@ -5,6 +5,8 @@
 
 const app = require('../server');
 
-// Export the Express app for Vercel
-module.exports = app;
+// Export a handler function so Vercel can invoke Express correctly
+module.exports = (req, res) => {
+  return app(req, res);
+};
 
