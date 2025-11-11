@@ -1,5 +1,13 @@
 # Quick Deploy - Share Your Website
 
+## ⚠️ Important: Deploy Frontend and Backend Separately!
+
+You need to create **TWO separate Vercel projects**:
+1. **Frontend** (React app) - This is your main website
+2. **Backend** (Node.js API) - This handles forms and database
+
+---
+
 ## Fastest Option: Vercel (5 minutes)
 
 ### Step 1: Install Vercel CLI
@@ -7,7 +15,7 @@
 npm install -g vercel
 ```
 
-### Step 2: Deploy
+### Step 2: Deploy Frontend
 ```bash
 cd frontend
 vercel
@@ -15,11 +23,28 @@ vercel
 
 ### Step 3: Follow Prompts
 - It will ask if you want to deploy - say **Yes**
-- It will give you a URL like: `https://aras-llantas-abc123.vercel.app`
-- **That's your shareable link!** 🎉
+- Project name: `aras-llantas-frontend` (or your choice)
+- It will give you a URL like: `https://aras-llantas-frontend.vercel.app`
+- **Save this URL!** 🎉
 
-### Step 4: Share the Link
-Copy the URL and share it with anyone!
+### Step 4: Deploy Backend (Separate Project)
+```bash
+cd ../node-backend
+vercel
+```
+
+- Project name: `aras-llantas-api` (or your choice)
+- It will give you a URL like: `https://aras-llantas-api.vercel.app`
+- **Save this URL!**
+
+### Step 5: Connect Frontend to Backend
+1. Go to Vercel Dashboard → Your Frontend Project
+2. Settings → Environment Variables
+3. Add: `REACT_APP_API_URL` = `https://aras-llantas-api.vercel.app/api`
+4. **Redeploy** the frontend project
+
+### Step 6: Share the Link
+Copy your **frontend URL** and share it with anyone! 🎉
 
 ---
 
