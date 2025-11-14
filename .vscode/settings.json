@@ -4,6 +4,7 @@
   "css.lint.unknownVendorSpecificProperties": "ignore",
   "css.lint.unknownProperties": "ignore",
   "css.lint.validProperties": "ignore",
+  "css.lint.duplicateProperties": "ignore",
   "css.validate": false,
   "scss.validate": false,
   "less.validate": false,

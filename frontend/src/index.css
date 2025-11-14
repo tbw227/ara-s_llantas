@@ -82,9 +82,10 @@ code {
         color: hsl(var(--foreground));
     }
     html {
-        -webkit-text-size-adjust: 100%; /* Safari, older browsers */
-        text-size-adjust: 100%; /* Chrome 54+, Edge 79+, Samsung Internet 6.0+ */
-        /* Note: VS Code linter shows false warnings - both properties are correct for cross-browser support */
+        /* Cross-browser text size adjustment - both properties needed for full support */
+        -webkit-text-size-adjust: 100%; /* Safari, Chrome, Edge (vendor prefix) */
+        /* stylelint-disable-next-line property-no-unknown */
+        text-size-adjust: 100%; /* Chrome 54+, Edge 79+, Samsung Internet 6.0+ (standard) - Firefox/Safari warning is expected */
     }
 }
 

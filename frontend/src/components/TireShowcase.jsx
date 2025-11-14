@@ -12,18 +12,29 @@ export const TireShowcase = React.memo(() => {
     const loadData = async () => {
       try {
         setLoading(true);
-        const tiresResponse = await apiService.getTires();
+        // Use Promise.race with timeout to prevent hanging
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Request timeout')), 5000)
+        );
+        
+        const tiresResponse = await Promise.race([
+          apiService.getTires(),
+          timeoutPromise
+        ]);
+        
         setTires(tiresResponse.data || []);
       } catch (error) {
         console.error('Failed to load tire data:', error);
-        // Set empty arrays on error
+        // Set empty arrays on error - don't block page render
         setTires([]);
       } finally {
         setLoading(false);
       }
     };
 
-    loadData();
+    // Delay API call slightly to allow initial render
+    const timer = setTimeout(loadData, 100);
+    return () => clearTimeout(timer);
   }, []);
 
   const lawnTires = useMemo(() => {
@@ -89,6 +100,9 @@ export const TireShowcase = React.memo(() => {
                 alt="Lawn mower tires"
                 className="w-full h-full object-cover"
                 loading="lazy"
+                decoding="async"
+                width="800"
+                height="600"
                 onError={(e) => {
                   e.target.src = '/images/tires/lawn-tire-generic.jpg';
                 }}
@@ -316,6 +330,9 @@ export const TireShowcase = React.memo(() => {
                 alt="Motorcycle tires"
                 className="w-full h-full object-cover"
                 loading="lazy"
+                decoding="async"
+                width="800"
+                height="600"
                 onError={(e) => {
                   e.target.src = '/images/tires/motorcycle-tire-generic.jpg';
                 }}

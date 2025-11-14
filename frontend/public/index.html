@@ -41,6 +41,15 @@
         <!-- Web App Manifest -->
         <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
         
+        <!-- Performance: Resource Hints -->
+        <link rel="dns-prefetch" href="https://api.arasllantas.com" />
+        <link rel="preconnect" href="https://api.arasllantas.com" crossorigin />
+        
+        <!-- Performance: Preload Critical Images -->
+        <link rel="preload" as="image" href="%PUBLIC_URL%/images/b7b1ad6a-37e5-493e-af46-136af60250c0.png" fetchpriority="high" />
+        <link rel="preload" as="image" href="%PUBLIC_URL%/images/lm_tire_3.jpg" />
+        <link rel="preload" as="image" href="%PUBLIC_URL%/images/m_tire_3.jpg" />
+        
         <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/

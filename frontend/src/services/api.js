@@ -35,18 +35,23 @@ class ApiService {
     // Construct full URL
     const url = `${API_BASE_URL}${endpoint}`;
 
-    // Default configuration
+    // Default configuration with timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+
     const config = {
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
       },
+      signal: options.signal || controller.signal, // Use provided signal or create new one
       ...options,
     };
 
     try {
       // Make HTTP request
       const response = await fetch(url, config);
+      clearTimeout(timeoutId);
       
       // Check if response is JSON
       const contentType = response.headers.get('content-type');
@@ -65,6 +70,11 @@ class ApiService {
 
       return data;
     } catch (error) {
+      clearTimeout(timeoutId);
+      if (error.name === 'AbortError') {
+        console.error('API request timeout:', endpoint);
+        throw new Error('Request timeout - please try again');
+      }
       console.error('API request failed:', error);
       throw error;
     }

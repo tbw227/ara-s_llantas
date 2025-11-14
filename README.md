@@ -2,6 +2,10 @@
 
 This repo contains a Node.js Express backend and a React (CRA) frontend.
 
+## 🚀 Quick Start
+
+**New to this project?** Start with the **[Complete Setup Guide](SETUP_GUIDE.md)** for step-by-step instructions.
+
 ## Prerequisites
 - Node.js 18+
 - MySQL (local or hosted) - optional for now (graceful fallback to in-memory storage)

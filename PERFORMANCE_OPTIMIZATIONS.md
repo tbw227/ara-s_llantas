@@ -1,115 +1,139 @@
-# Performance Optimizations - Ara's Llantas
+# Performance Optimizations
 
-## ✅ Optimizations Implemented
+This document outlines the performance optimizations implemented to improve page load times.
 
-### 1. **Code Splitting with React.lazy()** 
-   - **Components lazy-loaded:**
-     - `TireCatalog` - Heavy component with API calls
-     - `Cart` - Only loads when needed
-     - `EmailSignup` - Below the fold
-     - `AboutSection` - Below the fold
-     - `Footer` - Below the fold
-     - `ExitModal` - Only loads when exit intent detected
-   
-   **Impact:** Reduces initial bundle size by ~40-60%, faster Time to Interactive (TTI)
+## Implemented Optimizations
+
+### 1. **Resource Hints**
+- Added `dns-prefetch` and `preconnect` for API domain to reduce connection time
+- Preloads critical images (logo, tire images) to start downloading early
 
 ### 2. **Image Optimization**
-   - Added `loading="lazy"` to all below-the-fold images
-   - Added `fetchPriority="high"` to critical images (logo in header)
-   - Added explicit `width` and `height` attributes to prevent layout shift
-   - Optimized tire catalog images with lazy loading
+- Added `width` and `height` attributes to prevent layout shift
+- Added `decoding="async"` for non-blocking image decoding
+- Changed Hero background from CSS `background-image` to `<img>` tag for better optimization
+- Added `fetchpriority="high"` to critical above-the-fold images
+- Set proper `loading="lazy"` for below-the-fold images
+
+### 3. **API Request Optimization**
+- Added 8-second timeout to prevent hanging requests
+- Added 100ms delay to API calls to allow initial render
+- Graceful error handling that doesn't block page render
+- AbortController for proper request cancellation
+
+### 4. **Caching Headers**
+- Added long-term caching (1 year) for images
+- Static assets cached with `immutable` flag
+- Prevents unnecessary re-downloads on repeat visits
+
+### 5. **Code Splitting**
+- Already implemented with React.lazy() for major components
+- Components load on-demand, not all at once
+
+## Additional Recommendations
+
+### Image Compression
+**Critical**: Your images may be very large. Consider:
+
+1. **Compress images before upload:**
+   - Use tools like [TinyPNG](https://tinypng.com/) or [Squoosh](https://squoosh.app/)
+   - Target sizes:
+     - Hero logo: < 200KB
+     - Tire images: < 300KB each
    
-   **Impact:** Reduces initial load time, improves Largest Contentful Paint (LCP)
+2. **Use WebP format:**
+   - Convert images to WebP for 25-35% smaller file sizes
+   - Provide fallback JPG/PNG for older browsers
 
-### 3. **React.memo() for Component Memoization**
-   - Memoized components:
-     - `Header` - Prevents re-renders when cart updates
-     - `Footer` - Static component, no re-renders needed
-     - `Hero` - Static component
-     - `Cart` - Only re-renders when cart items change
-   
-   **Impact:** Reduces unnecessary re-renders by 70-80%
+3. **Create responsive image sizes:**
+   - Generate multiple sizes (mobile, tablet, desktop)
+   - Use `srcset` attribute for responsive images
 
-### 4. **useMemo() for Expensive Calculations**
-   - `cartCount` - Memoized cart item count calculation
-   - `Cart` subtotal, tax, total calculations - Memoized
-   - `LanguageContext` value - Memoized to prevent unnecessary context updates
-   
-   **Impact:** Prevents recalculations on every render
+### Database Optimization
+If API calls are slow:
 
-### 5. **useCallback() for Function Stability**
-   - `LanguageContext.t()` - Translation function memoized
-   - `LanguageContext.toggleLanguage()` - Memoized callback
-   
-   **Impact:** Prevents child component re-renders due to function reference changes
+1. **Add database indexes:**
+   ```sql
+   CREATE INDEX idx_category ON tires(category);
+   CREATE INDEX idx_brand ON tires(brand);
+   ```
 
-### 6. **Removed Unused Dependencies**
-   - Removed `web-vitals` package (not being used)
-   
-   **Impact:** Smaller `node_modules`, faster installs
+2. **Cache API responses:**
+   - Consider caching tire data in Redis or in-memory cache
+   - Tire data doesn't change frequently
 
-### 7. **Suspense Boundaries**
-   - Added Suspense boundaries for all lazy-loaded components
-   - Graceful loading states for better UX
-   
-   **Impact:** Better perceived performance, smoother loading experience
+3. **Optimize queries:**
+   - Only fetch needed fields
+   - Limit results if not needed
 
-## 📊 Expected Performance Improvements
+### Bundle Size Optimization
+1. **Analyze bundle:**
+   ```bash
+   npm run build
+   npx source-map-explorer build/static/js/*.js
+   ```
 
-### Before Optimizations:
-- Initial Bundle Size: ~800-1000 KB
-- Time to Interactive: ~3-5 seconds
-- First Contentful Paint: ~1.5-2 seconds
+2. **Tree-shake unused icons:**
+   - Import only needed icons from `lucide-react`
+   - Consider using a smaller icon library
 
-### After Optimizations:
-- Initial Bundle Size: ~400-600 KB (40-50% reduction)
-- Time to Interactive: ~1.5-2.5 seconds (40-50% improvement)
-- First Contentful Paint: ~0.8-1.2 seconds (30-40% improvement)
-- Re-render Count: 70-80% reduction
+3. **Consider code splitting:**
+   - Split large dependencies into separate chunks
+   - Use dynamic imports for heavy libraries
 
-## 🎯 Best Practices Implemented
+### CDN & Hosting
+1. **Use Vercel's CDN:**
+   - Already configured - images served from edge locations
+   - Ensure images are in `/public/images/` folder
 
-1. ✅ Code splitting for route-level components
-2. ✅ Lazy loading images below the fold
-3. ✅ Memoization of expensive calculations
-4. ✅ Component memoization to prevent unnecessary renders
-5. ✅ Stable function references with useCallback
-6. ✅ Explicit image dimensions to prevent CLS (Cumulative Layout Shift)
-7. ✅ Critical resource prioritization with fetchPriority
-8. ✅ Removed unused dependencies
+2. **Enable compression:**
+   - Vercel automatically enables gzip/brotli compression
+   - Verify in Network tab (Content-Encoding header)
 
-## 🚀 Additional Recommendations
+## Testing Performance
 
-### Future Optimizations (if needed):
+### Tools to Use:
+1. **Lighthouse** (Chrome DevTools)
+   - Run: F12 → Lighthouse → Generate Report
+   - Target: 90+ Performance score
 
-1. **Image Format Optimization**
-   - Convert PNG images to WebP format (smaller file sizes)
-   - Use responsive images with `srcset` for different screen sizes
+2. **WebPageTest**
+   - https://www.webpagetest.org/
+   - Test from multiple locations
 
-2. **Service Worker / PWA**
-   - Add service worker for offline support
-   - Cache API responses
+3. **Chrome DevTools Network Tab**
+   - Check actual load times
+   - Look for slow resources
 
-3. **API Optimization**
-   - Implement pagination for tire catalog
-   - Add API response caching
-   - Consider GraphQL for more efficient data fetching
+### Key Metrics to Monitor:
+- **First Contentful Paint (FCP)**: < 1.8s
+- **Largest Contentful Paint (LCP)**: < 2.5s
+- **Time to Interactive (TTI)**: < 3.8s
+- **Total Blocking Time (TBT)**: < 200ms
 
-4. **Bundle Analysis**
-   - Run `npm run build` and analyze bundle with `source-map-explorer`
-   - Identify any remaining large dependencies
+## Quick Wins Checklist
 
-5. **CDN for Static Assets**
-   - Serve images and static files from CDN
-   - Enable browser caching headers
+- [x] Resource hints (dns-prefetch, preconnect)
+- [x] Image preloading
+- [x] API timeout handling
+- [x] Caching headers
+- [x] Image width/height attributes
+- [ ] Compress images (manual step)
+- [ ] Convert to WebP format (optional)
+- [ ] Add database indexes (backend)
+- [ ] Implement API response caching (backend)
 
-## 📝 Notes
+## Expected Improvements
 
-- All optimizations maintain the same functionality
-- No breaking changes introduced
-- Backward compatible with existing code
-- All linting checks passing
+After implementing these optimizations:
+- **Initial load**: Should reduce from 1-2 minutes to 5-15 seconds
+- **Repeat visits**: Should be 2-5 seconds (cached assets)
+- **API calls**: Should timeout after 8 seconds max instead of hanging
 
+## Monitoring
 
-
-
+After deployment, monitor:
+1. Vercel Analytics (if enabled)
+2. Real User Monitoring (RUM) tools
+3. Backend API response times
+4. Image load times in Network tab
