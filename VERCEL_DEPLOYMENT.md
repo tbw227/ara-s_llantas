@@ -192,10 +192,35 @@ Then update frontend's `REACT_APP_API_URL` to point to your backend.
 ## Troubleshooting
 
 ### Frontend can't connect to backend
-- Check `REACT_APP_API_URL` is set to `https://api.arasllantas.com/api`
-- Verify backend is deployed and accessible
-- Check CORS settings in backend
-- Make sure backend allows your frontend domain
+
+**Common Issues:**
+
+1. **Environment Variable Not Set:**
+   - ✅ Go to Frontend Project → Settings → Environment Variables
+   - ✅ Add `REACT_APP_API_URL` = `https://your-backend-url.vercel.app/api`
+   - ✅ **MUST redeploy frontend after adding environment variable**
+
+2. **CORS Errors:**
+   - ✅ Go to Backend Project → Settings → Environment Variables
+   - ✅ Add `CORS_ORIGINS` = `https://your-frontend-url.vercel.app`
+   - ✅ Include both `www` and non-`www` versions if needed
+   - ✅ **MUST redeploy backend after adding environment variable**
+
+3. **Backend Not Accessible:**
+   - ✅ Test backend URL directly: `https://your-backend-url.vercel.app/api/health`
+   - ✅ Check backend deployment logs in Vercel
+   - ✅ Verify backend URL is correct (no typos)
+
+4. **404 Errors:**
+   - ✅ Make sure backend URL ends with `/api`
+   - ✅ Check backend routes are set up correctly
+
+**Quick Checklist:**
+- [ ] `REACT_APP_API_URL` is set in frontend environment variables
+- [ ] `CORS_ORIGINS` is set in backend environment variables
+- [ ] Both projects have been **redeployed** after adding environment variables
+- [ ] Backend health endpoint works: `/api/health`
+- [ ] Frontend can make API calls (check browser console)
 
 ### Backend errors
 - Check environment variables are set
