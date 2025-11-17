@@ -115,15 +115,15 @@ app.get('/api/health', (req, res) => {
  * Returns basic API information
  */
 app.get('/api', (req, res) => {
-  res.json({ 
+  res.json({
     message: "Ara's Llanta's API",
-    version: "1.0.0",
+    version: '1.0.0',
     endpoints: {
-      health: "/api/health",
-      tires: "/api/tires",
-      contact: "/api/contact",
-      newsletter: "/api/newsletter/subscribe"
-    }
+      health: '/api/health',
+      tires: '/api/tires',
+      contact: '/api/contact',
+      newsletter: '/api/newsletter/subscribe',
+    },
   });
 });
 
@@ -134,16 +134,16 @@ app.get('/api', (req, res) => {
  * Returns API information and redirects to /api
  */
 app.get('/', (req, res) => {
-  res.json({ 
+  res.json({
     message: "Ara's Llanta's API",
-    version: "1.0.0",
-    info: "This is the backend API. Use /api endpoints.",
+    version: '1.0.0',
+    info: 'This is the backend API. Use /api endpoints.',
     endpoints: {
-      health: "/api/health",
-      tires: "/api/tires",
-      contact: "/api/contact",
-      newsletter: "/api/newsletter/subscribe"
-    }
+      health: '/api/health',
+      tires: '/api/tires',
+      contact: '/api/contact',
+      newsletter: '/api/newsletter/subscribe',
+    },
   });
 });
 

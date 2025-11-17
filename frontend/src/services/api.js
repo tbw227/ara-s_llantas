@@ -14,8 +14,10 @@
  * const tires = await apiService.getTires();
  */
 
-// API base URL - configurable via environment variables
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8001/api';
+import getApiBaseUrl from '../utils/apiBaseUrl';
+
+// Get API base URL - throws error in production if not configured
+const API_BASE_URL = getApiBaseUrl();
 
 /**
  * API Service Class
@@ -34,6 +36,11 @@ class ApiService {
   async request(endpoint, options = {}) {
     // Construct full URL
     const url = `${API_BASE_URL}${endpoint}`;
+
+    // Log API URL in development for debugging
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`🌐 API Request: ${url}`);
+    }
 
     // Default configuration with timeout
     const controller = new AbortController();
