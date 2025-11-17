@@ -26,10 +26,10 @@ const getApiBaseUrlLazy = () => {
       API_BASE_URL = getApiBaseUrl();
     } catch (error) {
       // If getApiBaseUrl throws, use fallback
-      // In development, use proxy; in production, use hardcoded backend URL
+      // In development, use proxy; in production, use production API domain
       API_BASE_URL = process.env.NODE_ENV === 'development' 
         ? '/api' 
-        : 'https://ara-s-llantas-node-backend-gwzpzdj8s-tbw227s-projects.vercel.app/api';
+        : 'https://api.arasllantas.com/api';
       if (process.env.NODE_ENV === 'development') {
         // eslint-disable-next-line no-console
         console.error('Failed to get API base URL:', error);
