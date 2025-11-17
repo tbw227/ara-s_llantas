@@ -26,7 +26,8 @@ const getApiBaseUrlLazy = () => {
       API_BASE_URL = getApiBaseUrl();
     } catch (error) {
       // If getApiBaseUrl throws, use fallback
-      API_BASE_URL = 'http://localhost:8001/api';
+      // In development, use proxy; in production, this should be set via env var
+      API_BASE_URL = process.env.NODE_ENV === 'development' ? '/api' : 'http://localhost:8001/api';
       if (process.env.NODE_ENV === 'development') {
         // eslint-disable-next-line no-console
         console.error('Failed to get API base URL:', error);

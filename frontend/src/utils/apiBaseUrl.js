@@ -1,7 +1,7 @@
 /**
  * Returns the correct API base URL depending on environment.
  * - In production: uses REACT_APP_API_URL (must be set in Vercel)
- * - In development: falls back to localhost
+ * - In development: uses '/api' which is proxied to backend via package.json proxy setting
  * - In production without env var: tries to auto-detect or shows warning
  */
 const getApiBaseUrl = () => {
@@ -12,7 +12,9 @@ const getApiBaseUrl = () => {
 
   // ✅ Development fallback
   if (process.env.NODE_ENV === 'development') {
-    return 'http://localhost:8001/api';
+    // Use proxy in development (package.json proxy setting)
+    // This allows React dev server to proxy requests to backend
+    return '/api';
   }
 
   // ⚠️ Production: Try to auto-detect backend URL
@@ -65,7 +67,8 @@ const getApiBaseUrl = () => {
   }
   
   // Fallback to a reasonable default (will likely fail, but won't crash the app)
-  return 'http://localhost:8001/api';
+  // In production, this should never be reached if env var is set
+  return '/api';
 };
 
 export default getApiBaseUrl;
