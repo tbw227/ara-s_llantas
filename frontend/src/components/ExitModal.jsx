@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Loader2, CheckCircle } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -19,6 +19,47 @@ export const ExitModal = ({ isOpen, onClose }) => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showThankYou, setShowThankYou] = useState(false);
+  const timeoutRef = useRef(null);
+
+  // Auto-close modal after showing thank you message
+  useEffect(() => {
+    if (showThankYou && isOpen) {
+      // Clear any existing timeout
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      // Auto-close after 5 seconds
+      timeoutRef.current = setTimeout(() => {
+        setFormData({ name: '', email: '', phone: '', message: '' });
+        setShowThankYou(false);
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current);
+          timeoutRef.current = null;
+        }
+        onClose();
+      }, 5000);
+    }
+
+    // Cleanup on unmount or when showThankYou changes
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [showThankYou, isOpen, onClose]);
+
+  // Reset state when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setFormData({ name: '', email: '', phone: '', message: '' });
+      setShowThankYou(false);
+      setIsSubmitting(false);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    }
+  }, [isOpen]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,14 +67,15 @@ export const ExitModal = ({ isOpen, onClose }) => {
 
     try {
       await apiService.submitContact(formData);
-      console.log('Contact form submitted:', formData);
       setShowThankYou(true);
       toast({
         title: t('thankYou'),
         description: t('getBackSoon'),
       });
     } catch (error) {
-      console.error('Contact form error:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Contact form error:', error);
+      }
       toast({
         title: t('subscribeErrorTitle'),
         description: t('subscribeError'),
@@ -47,7 +89,17 @@ export const ExitModal = ({ isOpen, onClose }) => {
   const handleClose = () => {
     setFormData({ name: '', email: '', phone: '', message: '' });
     setShowThankYou(false);
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
     onClose();
+  };
+
+  const handleOpenChange = (open) => {
+    if (!open) {
+      handleClose();
+    }
   };
 
   const handleChange = (e) => {
@@ -55,7 +107,7 @@ export const ExitModal = ({ isOpen, onClose }) => {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="bg-gray-900 border-gray-800 text-white max-w-md">
         {showThankYou ? (
           <>

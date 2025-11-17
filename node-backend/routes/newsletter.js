@@ -144,7 +144,10 @@ router.post('/newsletter/subscribe', async (req, res) => {
         },
       });
     } catch (dbError) {
-      console.error('Database error:', dbError);
+      if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_LOGGING === 'true') {
+        // eslint-disable-next-line no-console
+        console.error('Database error:', dbError);
+      }
 
       // Check for duplicate in fallback storage
       const existingInMemory = newsletterSubscribers.find(
@@ -185,7 +188,10 @@ router.post('/newsletter/subscribe', async (req, res) => {
       });
     }
   } catch (error) {
-    console.error('Newsletter subscription error:', error);
+    if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_LOGGING === 'true') {
+      // eslint-disable-next-line no-console
+      console.error('Newsletter subscription error:', error);
+    }
     res.status(500).json({
       success: false,
       error: 'Failed to subscribe to newsletter',
@@ -222,7 +228,10 @@ router.get('/newsletter/subscribers', async (req, res) => {
         count: subscribers.length,
       });
     } catch (dbError) {
-      console.error('Database error:', dbError);
+      if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_LOGGING === 'true') {
+        // eslint-disable-next-line no-console
+        console.error('Database error:', dbError);
+      }
 
       // Fallback to in-memory storage
       const sortedSubscribers = newsletterSubscribers.sort(
@@ -236,7 +245,10 @@ router.get('/newsletter/subscribers', async (req, res) => {
       });
     }
   } catch (error) {
-    console.error('Get newsletter subscribers error:', error);
+    if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_LOGGING === 'true') {
+      // eslint-disable-next-line no-console
+      console.error('Get newsletter subscribers error:', error);
+    }
     res.status(500).json({
       success: false,
       error: 'Failed to fetch newsletter subscribers',
@@ -290,7 +302,10 @@ router.post('/newsletter/unsubscribe', async (req, res) => {
         message: 'You have been unsubscribed from our newsletter.',
       });
     } catch (dbError) {
-      console.error('Database error:', dbError);
+      if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_LOGGING === 'true') {
+        // eslint-disable-next-line no-console
+        console.error('Database error:', dbError);
+      }
 
       // Fallback to in-memory storage
       const subscriber = newsletterSubscribers.find(
@@ -313,7 +328,10 @@ router.post('/newsletter/unsubscribe', async (req, res) => {
       });
     }
   } catch (error) {
-    console.error('Newsletter unsubscribe error:', error);
+    if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_LOGGING === 'true') {
+      // eslint-disable-next-line no-console
+      console.error('Newsletter unsubscribe error:', error);
+    }
     res.status(500).json({
       success: false,
       error: 'Failed to unsubscribe from newsletter',

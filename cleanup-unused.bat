@@ -2,20 +2,28 @@
 echo Cleaning up unused files and folders...
 echo.
 
+if exist "tests" (
+    echo Removing empty tests folder...
+    rmdir /s /q "tests"
+    echo Tests folder removed.
+) else (
+    echo Tests folder not found.
+)
+
+if exist "nginx" (
+    echo Removing empty nginx folder...
+    rmdir /s /q "nginx"
+    echo Nginx folder removed.
+) else (
+    echo Nginx folder not found.
+)
+
 if exist "frontend\plugins" (
-    echo Removing plugins folder...
+    echo Removing empty plugins folder...
     rmdir /s /q "frontend\plugins"
     echo Plugins folder removed.
 ) else (
     echo Plugins folder not found.
-)
-
-if exist "frontend\build" (
-    echo Removing build folder...
-    rmdir /s /q "frontend\build"
-    echo Build folder removed.
-) else (
-    echo Build folder not found.
 )
 
 echo.

@@ -16,8 +16,25 @@
 
 import getApiBaseUrl from '../utils/apiBaseUrl';
 
-// Get API base URL - throws error in production if not configured
-const API_BASE_URL = getApiBaseUrl();
+// Get API base URL - lazy evaluation to support runtime auto-detection
+// This allows window.location to be available when auto-detecting
+let API_BASE_URL = null;
+
+const getApiBaseUrlLazy = () => {
+  if (API_BASE_URL === null) {
+    try {
+      API_BASE_URL = getApiBaseUrl();
+    } catch (error) {
+      // If getApiBaseUrl throws, use fallback
+      API_BASE_URL = 'http://localhost:8001/api';
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error('Failed to get API base URL:', error);
+      }
+    }
+  }
+  return API_BASE_URL;
+};
 
 /**
  * API Service Class
@@ -34,11 +51,14 @@ class ApiService {
    * @throws {Error} If request fails
    */
   async request(endpoint, options = {}) {
+    // Get API base URL (lazy evaluation for runtime auto-detection)
+    const baseUrl = getApiBaseUrlLazy();
     // Construct full URL
-    const url = `${API_BASE_URL}${endpoint}`;
+    const url = `${baseUrl}${endpoint}`;
 
-    // Log API URL in development for debugging
+    // Log API URL in development for debugging only
     if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
       console.log(`🌐 API Request: ${url}`);
     }
 
@@ -64,7 +84,10 @@ class ApiService {
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
         const text = await response.text();
-        console.error('Expected JSON but got:', contentType, text.substring(0, 200));
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.error('Expected JSON but got:', contentType, text.substring(0, 200));
+        }
         throw new Error(`Expected JSON response but got ${contentType}. This usually means the backend server isn't running or the API endpoint doesn't exist.`);
       }
       
@@ -79,10 +102,16 @@ class ApiService {
     } catch (error) {
       clearTimeout(timeoutId);
       if (error.name === 'AbortError') {
-        console.error('API request timeout:', endpoint);
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.error('API request timeout:', endpoint);
+        }
         throw new Error('Request timeout - please try again');
       }
-      console.error('API request failed:', error);
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error('API request failed:', error);
+      }
       throw error;
     }
   }

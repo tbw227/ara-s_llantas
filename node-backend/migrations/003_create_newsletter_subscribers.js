@@ -15,7 +15,7 @@ exports.up = function (knex) {
     table.enum('status', ['active', 'unsubscribed']).defaultTo('active');
     table.string('source').defaultTo('website'); // Track where subscription came from
     table.timestamps(true, true);
-    
+
     // Index for faster lookups
     table.index('email');
     table.index('status');

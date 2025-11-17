@@ -24,7 +24,10 @@ export const TireShowcase = React.memo(() => {
         
         setTires(tiresResponse.data || []);
       } catch (error) {
-        console.error('Failed to load tire data:', error);
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.error('Failed to load tire data:', error);
+        }
         // Set empty arrays on error - don't block page render
         setTires([]);
       } finally {

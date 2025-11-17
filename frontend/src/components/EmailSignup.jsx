@@ -57,14 +57,16 @@ export const EmailSignup = React.memo(() => {
     try {
       const formData = { email: submittedEmail };
       await apiService.subscribeNewsletter(formData);
-      console.log('Newsletter signup form submitted:', formData);
       
       toast({
         title: t('thankYou'),
         description: t('newsletterSubscribed'),
       });
     } catch (error) {
-      console.error('Newsletter signup error:', error);
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error('Newsletter signup error:', error);
+      }
       // Still show success message to user, but log the error
       // The thank you message is already showing, so we just show a warning toast
       toast({

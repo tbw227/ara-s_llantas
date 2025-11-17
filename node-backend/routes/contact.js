@@ -112,7 +112,10 @@ router.post('/contact', async (req, res) => {
         },
       });
     } catch (dbError) {
-      console.error('Database error:', dbError);
+      if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_LOGGING === 'true') {
+        // eslint-disable-next-line no-console
+        console.error('Database error:', dbError);
+      }
 
       // Fallback to in-memory storage
       contactMessage.timestamp = new Date().toISOString();
@@ -128,7 +131,10 @@ router.post('/contact', async (req, res) => {
       });
     }
   } catch (error) {
-    console.error('Contact form error:', error);
+    if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_LOGGING === 'true') {
+      // eslint-disable-next-line no-console
+      console.error('Contact form error:', error);
+    }
     res.status(500).json({
       success: false,
       error: 'Failed to submit contact form',
@@ -163,7 +169,10 @@ router.get('/contact', async (req, res) => {
         count: messages.length,
       });
     } catch (dbError) {
-      console.error('Database error:', dbError);
+      if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_LOGGING === 'true') {
+        // eslint-disable-next-line no-console
+        console.error('Database error:', dbError);
+      }
 
       // Fallback to in-memory storage
       const sortedMessages = contactMessages.sort(
@@ -177,7 +186,10 @@ router.get('/contact', async (req, res) => {
       });
     }
   } catch (error) {
-    console.error('Get contact messages error:', error);
+    if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_LOGGING === 'true') {
+      // eslint-disable-next-line no-console
+      console.error('Get contact messages error:', error);
+    }
     res.status(500).json({
       success: false,
       error: 'Failed to fetch contact messages',
@@ -217,7 +229,10 @@ router.get('/contact/:id', async (req, res) => {
         data: message,
       });
     } catch (dbError) {
-      console.error('Database error:', dbError);
+      if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_LOGGING === 'true') {
+        // eslint-disable-next-line no-console
+        console.error('Database error:', dbError);
+      }
 
       // Fallback to in-memory storage
       const message = contactMessages.find((m) => m.id === req.params.id);
@@ -235,7 +250,10 @@ router.get('/contact/:id', async (req, res) => {
       });
     }
   } catch (error) {
-    console.error('Get contact message error:', error);
+    if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_LOGGING === 'true') {
+      // eslint-disable-next-line no-console
+      console.error('Get contact message error:', error);
+    }
     res.status(500).json({
       success: false,
       error: 'Failed to fetch contact message',

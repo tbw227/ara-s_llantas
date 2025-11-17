@@ -354,7 +354,10 @@ router.get('/tires', async (req, res) => {
       count: tires.length,
     });
   } catch (error) {
-    console.error('Database error:', error);
+    if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_LOGGING === 'true') {
+      // eslint-disable-next-line no-console
+      console.error('Database error:', error);
+    }
 
     // Fallback to mock data if database fails
     let filteredTires = [...allTires];
@@ -409,7 +412,10 @@ router.get('/tires/:id', async (req, res) => {
       data: tire,
     });
   } catch (error) {
-    console.error('Database error:', error);
+    if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_LOGGING === 'true') {
+      // eslint-disable-next-line no-console
+      console.error('Database error:', error);
+    }
 
     // Fallback to mock data
     const tire = allTires.find((t) => t.id === req.params.id);
@@ -449,7 +455,10 @@ router.get('/tires/categories', async (req, res) => {
       data: categories,
     });
   } catch (error) {
-    console.error('Database error:', error);
+    if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_LOGGING === 'true') {
+      // eslint-disable-next-line no-console
+      console.error('Database error:', error);
+    }
 
     // Fallback to mock data
     const categories = [...new Set(allTires.map((tire) => tire.category))];
@@ -483,7 +492,10 @@ router.get('/tires/brands', async (req, res) => {
       data: sortedBrands,
     });
   } catch (error) {
-    console.error('Database error:', error);
+    if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_LOGGING === 'true') {
+      // eslint-disable-next-line no-console
+      console.error('Database error:', error);
+    }
 
     // Fallback to mock data
     const brands = [...new Set(allTires.map((tire) => tire.brand))].sort();

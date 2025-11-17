@@ -24,9 +24,15 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 8001;
 
-console.log("🚀 Starting Ara's Llanta's API Server...");
-console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-console.log(`🔌 Port: ${PORT}`);
+// Only log in development or when explicitly enabled
+if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_LOGGING === 'true') {
+  // eslint-disable-next-line no-console
+  console.log("🚀 Starting Ara's Llanta's API Server...");
+  // eslint-disable-next-line no-console
+  console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+  // eslint-disable-next-line no-console
+  console.log(`🔌 Port: ${PORT}`);
+}
 
 // ========================================
 // SECURITY MIDDLEWARE
@@ -187,7 +193,11 @@ app.use('*', (req, res) => {
  * Logs error details for debugging
  */
 app.use((err, req, res, _next) => {
-  console.error('Global error:', err.message);
+  // Log errors in development or when logging is enabled
+  if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_LOGGING === 'true') {
+    // eslint-disable-next-line no-console
+    console.error('Global error:', err.message);
+  }
   res.status(500).json({ error: 'Something went wrong!' });
 });
 
@@ -202,9 +212,14 @@ app.use((err, req, res, _next) => {
  */
 if (require.main === module && process.env.VERCEL !== '1') {
   app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Frontend: http://localhost:${PORT}`);
-    console.log(`API: http://localhost:${PORT}/api`);
+    if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_LOGGING === 'true') {
+      // eslint-disable-next-line no-console
+      console.log(`Server running on port ${PORT}`);
+      // eslint-disable-next-line no-console
+      console.log(`Frontend: http://localhost:${PORT}`);
+      // eslint-disable-next-line no-console
+      console.log(`API: http://localhost:${PORT}/api`);
+    }
   });
 }
 
