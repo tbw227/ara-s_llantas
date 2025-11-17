@@ -46,10 +46,12 @@ const getApiBaseUrl = () => {
   const hostname = window.location.hostname;
 
   // Production: Custom domain (www.arasllantas.com or arasllantas.com)
-  // Use production API subdomain if available, otherwise use backend URL
+  // Use backend URL directly (api subdomain may not be configured)
+  // The backend is deployed separately on Vercel
   if (hostname === 'arasllantas.com' || hostname === 'www.arasllantas.com') {
-    // Try to use api subdomain, but fallback to backend URL if not configured
-    return 'https://api.arasllantas.com/api';
+    // Use the Vercel backend URL directly
+    // If you want to use api.arasllantas.com, configure it in Vercel first
+    return PRODUCTION_BACKEND_URL;
   }
 
   // Production: ALL Vercel preview URLs use the backend URL
