@@ -115,12 +115,22 @@ REACT_APP_API_URL = https://api.arasllantas.com/api
 
 In Vercel Dashboard → Your Backend Project → Settings → Environment Variables:
 
+**Option 1: Connection String (Recommended)**
+```
+NODE_ENV = production
+DATABASE_URL = postgresql://user:password@host:5432/database_name
+CORS_ORIGINS = https://arasllantas.com,https://www.arasllantas.com
+```
+
+**Option 2: Individual Parameters**
 ```
 NODE_ENV = production
 DB_HOST = your-database-host
 DB_USER = your-database-user
 DB_PASSWORD = your-database-password
 DB_NAME = aras_llantas
+DB_PORT = 5432
+DB_SSL = true
 CORS_ORIGINS = https://arasllantas.com,https://www.arasllantas.com
 ```
 
@@ -136,18 +146,23 @@ Vercel serverless functions need an external database. Options:
 
 1. In Vercel Dashboard → Your Backend Project
 2. Go to **Storage** → **Create Database** → **Postgres**
-3. Update your backend to use Postgres instead of MySQL
-4. Update connection string in environment variables
+3. Follow the setup wizard (database name, region, etc.)
+4. Vercel will automatically add `POSTGRES_URL` to your environment variables
+5. Add `DATABASE_URL` = `POSTGRES_URL` (or use the connection string directly)
+6. **Redeploy** your backend project
+7. Run migrations (see `node-backend/POSTGRES_SETUP.md`)
 
 ### Option B: External Database Service
 
 Use services like:
-- Railway (free tier available)
-- Render (free tier available)
-- PlanetScale (MySQL compatible, free tier)
+- Railway (Postgres, free tier available)
+- Render (Postgres, free tier available)
 - Supabase (Postgres, free tier)
+- Neon (Postgres, free tier)
 
-Then update `DB_HOST`, `DB_USER`, `DB_PASSWORD` in Vercel environment variables.
+Then update `DATABASE_URL` or `DB_HOST`, `DB_USER`, `DB_PASSWORD` in Vercel environment variables.
+
+**See `node-backend/POSTGRES_SETUP.md` for detailed setup instructions.**
 
 ---
 

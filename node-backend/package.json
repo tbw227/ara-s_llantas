@@ -20,7 +20,7 @@
     "tires",
     "api",
     "express",
-    "mysql"
+    "postgres"
   ],
   "author": "",
   "license": "ISC",
@@ -30,7 +30,7 @@
     "express": "^4.18.2",
     "express-rate-limit": "^7.1.5",
     "helmet": "^7.1.0",
-    "mysql2": "^3.6.5"
+    "pg": "^8.11.3"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
