@@ -17,19 +17,16 @@ const getApiBaseUrl = () => {
     return '/api';
   }
 
-  // ⚠️ Production: Try to auto-detect backend URL
+  // ⚠️ Production: Use hardcoded backend URL as fallback
+  // This ensures the app works even if REACT_APP_API_URL is not set in Vercel
+  const PRODUCTION_BACKEND_URL = 'https://ara-s-llantas-node-backend-gwzpzdj8s-tbw227s-projects.vercel.app/api';
+  
+  // Try to auto-detect based on domain
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
 
     // If on custom domain, try to use api subdomain
     if (hostname === 'arasllantas.com' || hostname === 'www.arasllantas.com') {
-      // Silent auto-detection in production, warn in development
-      if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-next-line no-console
-        console.warn(
-          '⚠️ REACT_APP_API_URL not set! Using auto-detected: https://api.arasllantas.com/api'
-        );
-      }
       return 'https://api.arasllantas.com/api';
     }
 
@@ -46,29 +43,13 @@ const getApiBaseUrl = () => {
         backendProject = frontendProject.replace('aras', 'aras-llantas-node-backend');
       }
       
-      // Silent auto-detection in production, warn in development
-      if (process.env.NODE_ENV === 'development') {
-        // eslint-disable-next-line no-console
-        console.warn(
-          `⚠️ REACT_APP_API_URL not set! Using auto-detected: https://${backendProject}.vercel.app/api`
-        );
-      }
       return `https://${backendProject}.vercel.app/api`;
     }
   }
 
-  // ❌ Last resort: Show error but don't crash
-  if (process.env.NODE_ENV === 'development') {
-    // eslint-disable-next-line no-console
-    console.error(
-      '❌ REACT_APP_API_URL is not set and could not auto-detect backend URL! ' +
-      'Please configure it in Vercel → Settings → Environment Variables.'
-    );
-  }
-  
-  // Fallback to a reasonable default (will likely fail, but won't crash the app)
-  // In production, this should never be reached if env var is set
-  return '/api';
+  // Production fallback: Use hardcoded backend URL
+  // This is the actual deployed backend URL
+  return PRODUCTION_BACKEND_URL;
 };
 
 export default getApiBaseUrl;
