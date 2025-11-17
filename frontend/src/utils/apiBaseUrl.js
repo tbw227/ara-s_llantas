@@ -2,13 +2,25 @@
  * Returns the correct API base URL depending on environment.
  * Production-ready configuration:
  * - Custom domain (www.arasllantas.com) → api.arasllantas.com
- * - Vercel preview URLs → Vercel backend URL
+ * - Vercel preview URLs → Vercel backend URL (separate deployment)
  * - Development → localhost proxy
  */
 const getApiBaseUrl = () => {
   // ✅ Always prefer environment variable (highest priority)
   if (process.env.REACT_APP_API_URL) {
-    return process.env.REACT_APP_API_URL;
+    // Validate the environment variable URL
+    const envUrl = process.env.REACT_APP_API_URL.trim();
+    
+    // Ensure it's a valid URL format
+    if (!envUrl.startsWith('http://') && !envUrl.startsWith('https://') && !envUrl.startsWith('/')) {
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.warn('⚠️ REACT_APP_API_URL does not look like a valid URL:', envUrl);
+      }
+    }
+    
+    // Remove trailing slash if present
+    return envUrl.endsWith('/') ? envUrl.slice(0, -1) : envUrl;
   }
 
   // ✅ Development: Use proxy
@@ -18,25 +30,40 @@ const getApiBaseUrl = () => {
     return '/api';
   }
 
-  // ✅ Production: Determine URL based on current domain
-  if (typeof window !== 'undefined') {
-    const hostname = window.location.hostname;
-
-    // Production: Custom domain (www.arasllantas.com or arasllantas.com)
-    // Use production API subdomain
-    if (hostname === 'arasllantas.com' || hostname === 'www.arasllantas.com') {
-      return 'https://api.arasllantas.com/api';
-    }
-
-    // Production: Vercel preview URLs
-    // Use Vercel backend URL for preview deployments
-    if (hostname.includes('vercel.app')) {
-      return 'https://ara-s-llantas-node-backend-gwzpzdj8s-tbw227s-projects.vercel.app/api';
-    }
+  // ✅ Production: Always use the backend URL (separate deployment)
+  // The backend is deployed separately, so we always use the full backend URL
+  // IMPORTANT: This is the actual backend deployment URL, NOT the frontend URL
+  // Frontend: aras-llantas.vercel.app (or www.arasllantas.com)
+  // Backend: ara-s-llantas-node-backend-gwzpzdj8s-tbw227s-projects.vercel.app
+  const PRODUCTION_BACKEND_URL = 'https://ara-s-llantas-node-backend-gwzpzdj8s-tbw227s-projects.vercel.app/api';
+  
+  // Must check window first to avoid SSR issues
+  if (typeof window === 'undefined') {
+    // Server-side rendering fallback - use backend URL
+    return PRODUCTION_BACKEND_URL;
   }
 
-  // Fallback: Use Vercel backend URL (should not be reached in normal operation)
-  return 'https://ara-s-llantas-node-backend-gwzpzdj8s-tbw227s-projects.vercel.app/api';
+  const hostname = window.location.hostname;
+
+  // Production: Custom domain (www.arasllantas.com or arasllantas.com)
+  // Use production API subdomain if available, otherwise use backend URL
+  if (hostname === 'arasllantas.com' || hostname === 'www.arasllantas.com') {
+    // Try to use api subdomain, but fallback to backend URL if not configured
+    return 'https://api.arasllantas.com/api';
+  }
+
+  // Production: ALL Vercel preview URLs use the backend URL
+  // This is critical - frontend and backend are separate deployments
+  // The frontend might be at: aras-llantas.vercel.app
+  // But the backend is at: ara-s-llantas-node-backend-gwzpzdj8s-tbw227s-projects.vercel.app
+  // NEVER use the frontend domain as the API base URL!
+  if (hostname.includes('vercel.app')) {
+    // Always use the backend URL for all Vercel deployments
+    return PRODUCTION_BACKEND_URL;
+  }
+
+  // Fallback: Always use backend URL (separate deployment)
+  return PRODUCTION_BACKEND_URL;
 };
 
 export default getApiBaseUrl;
