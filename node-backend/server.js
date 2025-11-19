@@ -68,17 +68,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ========================================
-// STATIC FILE SERVING
-// ========================================
-
-// Serve static files from the React frontend build directory
-const frontendPath = path.join(__dirname, '../frontend/build');
-if (require('fs').existsSync(frontendPath)) {
-  app.use(express.static(frontendPath));
-}
-
-// ========================================
-// ROUTES
+// ROUTES (Must come BEFORE static file serving)
 // ========================================
 
 // Import route modules
@@ -90,6 +80,20 @@ const newsletterRoutes = require('./routes/newsletter');
 app.use('/api', tireRoutes); // Tire catalog endpoints
 app.use('/api', contactRoutes); // Contact form endpoints
 app.use('/api', newsletterRoutes); // Newsletter subscription endpoints
+
+// ========================================
+// STATIC FILE SERVING (After API routes to avoid conflicts)
+// ========================================
+
+// Serve static files from the React frontend build directory
+// Exclude /api routes from static file serving
+const frontendPath = path.join(__dirname, '../frontend/build');
+if (require('fs').existsSync(frontendPath)) {
+  app.use(express.static(frontendPath, {
+    // Don't serve static files for API routes
+    index: false,
+  }));
+}
 
 // ========================================
 // API ENDPOINTS

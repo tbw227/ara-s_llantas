@@ -82,10 +82,10 @@ code {
         color: hsl(var(--foreground));
     }
     html {
-        /* Cross-browser text size adjustment - both properties needed for full support */
-        -webkit-text-size-adjust: 100%; /* Safari, Chrome, Edge (vendor prefix) */
+        /* Cross-browser text size adjustment - vendor prefix first, then standard property */
+        -webkit-text-size-adjust: 100%; /* Safari, Chrome, Edge (vendor prefix for older browsers) */
         /* stylelint-disable-next-line property-no-unknown */
-        text-size-adjust: 100%; /* Chrome 54+, Edge 79+, Samsung Internet 6.0+ (standard) - Firefox/Safari warning is expected */
+        text-size-adjust: 100%; /* Chrome 54+, Edge 79+, Samsung Internet 6.0+ (standard) */
     }
 }
 
