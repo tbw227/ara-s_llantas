@@ -39,21 +39,49 @@ if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_LOGGING === 'tru
 // ========================================
 
 // Helmet: Sets various HTTP headers for security
-app.use(helmet());
+// Configure Helmet to be less restrictive for API routes
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'"],
+    },
+  },
+  crossOriginEmbedderPolicy: false, // Allow cross-origin resources
+}));
 
 // Rate limiting: Prevents abuse by limiting requests per IP
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 app.use(limiter);
 
 // CORS: Configure cross-origin resource sharing
 const corsOptions = {
-  origin: process.env.CORS_ORIGINS
-    ? process.env.CORS_ORIGINS.split(',')
-    : ['http://localhost:3000'],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = process.env.CORS_ORIGINS
+      ? process.env.CORS_ORIGINS.split(',')
+      : ['http://localhost:3000', 'http://localhost:8001'];
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true, // Allow cookies and authorization headers
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 };
 app.use(cors(corsOptions));
 
@@ -86,13 +114,16 @@ app.use('/api', newsletterRoutes); // Newsletter subscription endpoints
 // ========================================
 
 // Serve static files from the React frontend build directory
-// Exclude /api routes from static file serving
+// Only serve static files for non-API routes
 const frontendPath = path.join(__dirname, '../frontend/build');
 if (require('fs').existsSync(frontendPath)) {
-  app.use(express.static(frontendPath, {
-    // Don't serve static files for API routes
-    index: false,
-  }));
+  app.use((req, res, next) => {
+    // Skip static file serving for API routes
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
+    express.static(frontendPath, { index: false })(req, res, next);
+  });
 }
 
 // ========================================
