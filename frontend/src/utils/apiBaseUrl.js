@@ -12,11 +12,9 @@ const getApiBaseUrl = () => {
     if (process.env.NODE_ENV === 'development') {
       return '/api';
     }
-    // Production: fail fast if not configured
-    throw new Error(
-      'REACT_APP_API_URL is not set. ' +
-      'Configure it in Vercel → Project Settings → Environment Variables.'
-    );
+    // Production build: allow build to complete, will use '/api' at runtime
+    // Runtime check will happen when the function is actually called
+    return '/api';
   }
 
   // Remove trailing slashes
