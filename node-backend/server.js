@@ -71,13 +71,10 @@ app.use(express.urlencoded({ extended: true }));
 // STATIC FILE SERVING
 // ========================================
 
-// Serve static files from the React frontend build directory (only in non-Vercel environments)
-// Vercel handles static files separately, so we skip this in serverless environment
-if (process.env.VERCEL !== '1') {
-  const frontendPath = path.join(__dirname, '../frontend/build');
-  if (require('fs').existsSync(frontendPath)) {
-    app.use(express.static(frontendPath));
-  }
+// Serve static files from the React frontend build directory
+const frontendPath = path.join(__dirname, '../frontend/build');
+if (require('fs').existsSync(frontendPath)) {
+  app.use(express.static(frontendPath));
 }
 
 // ========================================
@@ -134,10 +131,10 @@ app.get('/api', (req, res) => {
 });
 
 /**
- * Root Endpoint (for Vercel)
+ * Root Endpoint
  * GET /
  *
- * Returns API information and redirects to /api
+ * Returns API information
  */
 app.get('/', (req, res) => {
   res.json({
@@ -161,19 +158,16 @@ app.get('/', (req, res) => {
  * Frontend Route Handler
  * Serves the React app for all non-API routes
  * This must come after API routes to avoid conflicts
- * Only serve frontend in non-Vercel environments (Vercel handles frontend separately)
  */
-if (process.env.VERCEL !== '1') {
-  app.get('*', (req, res) => {
-    const frontendPath = path.join(__dirname, '../frontend/build');
-    const indexPath = path.join(frontendPath, 'index.html');
-    if (require('fs').existsSync(indexPath)) {
-      res.sendFile(indexPath);
-    } else {
-      res.status(404).json({ error: 'Frontend not found. Please deploy frontend separately.' });
-    }
-  });
-}
+app.get('*', (req, res) => {
+  const frontendPath = path.join(__dirname, '../frontend/build');
+  const indexPath = path.join(frontendPath, 'index.html');
+  if (require('fs').existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.status(404).json({ error: 'Frontend not found. Please deploy frontend separately.' });
+  }
+});
 
 // ========================================
 // ERROR HANDLING MIDDLEWARE
@@ -206,11 +200,10 @@ app.use((err, req, res, _next) => {
 // ========================================
 
 /**
- * Start server only if this file is run directly AND not on Vercel
- * Vercel handles the server, so we don't start listening there
- * This allows the app to be imported for testing and Vercel serverless functions
+ * Start server only if this file is run directly
+ * This allows the app to be imported for testing
  */
-if (require.main === module && process.env.VERCEL !== '1') {
+if (require.main === module) {
   app.listen(PORT, () => {
     if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_LOGGING === 'true') {
       // eslint-disable-next-line no-console

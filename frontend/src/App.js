@@ -5,7 +5,6 @@ import { Hero } from './components/Hero';
 import { Toaster } from './components/ui/sonner';
 import { LanguageProvider } from './context/LanguageContext';
 import { SEO } from './components/SEO';
-import { SpeedInsights } from '@vercel/speed-insights/react';
 
 // Lazy load heavy components for code splitting
 const TireShowcase = lazy(() => import('./components/TireShowcase').then(module => ({ default: module.TireShowcase })));
@@ -59,7 +58,6 @@ function AppContent() {
         />
       </Suspense>
       <Toaster />
-      <SpeedInsights />
     </div>
   );
 }
