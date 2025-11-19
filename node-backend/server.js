@@ -102,9 +102,9 @@ app.use(express.urlencoded({ extended: true }));
 // ========================================
 
 // Import route modules
-const tireRoutes = require('./api/routes/tires');
-const contactRoutes = require('./api/routes/contact');
-const newsletterRoutes = require('./api/routes/newsletter');
+const tireRoutes = require('./api/tires');
+const contactRoutes = require('./api/contact');
+const newsletterRoutes = require('./api/newsletter');
 
 // Mount routes with /api prefix
 app.use('/api', tireRoutes); // Tire catalog endpoints
