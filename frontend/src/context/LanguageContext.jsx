@@ -91,7 +91,7 @@ const translations = {
     submit: 'Submit',
     justLeave: 'See You Soon',
     thankYou: 'Thank you!',
-    getBackSoon: "We'll get back to you soon.",
+    getBackSoon: "We'll contact you shortly.",
     
     // Tire Showcase
     ourTires: 'Our Tire Selection',
