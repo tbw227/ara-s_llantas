@@ -22,7 +22,7 @@ require('dotenv').config();
 
 // Initialize Express application
 const app = express();
-const PORT = process.env.PORT || 8001;
+const PORT = process.env.PORT || 8000;
 
 // Only log in development or when explicitly enabled
 if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_LOGGING === 'true') {
@@ -40,18 +40,20 @@ if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_LOGGING === 'tru
 
 // Helmet: Sets various HTTP headers for security
 // Configure Helmet to be less restrictive for API routes
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'"],
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'"],
+        imgSrc: ["'self'", 'data:', 'https:'],
+        connectSrc: ["'self'"],
+      },
     },
-  },
-  crossOriginEmbedderPolicy: false, // Allow cross-origin resources
-}));
+    crossOriginEmbedderPolicy: false, // Allow cross-origin resources
+  })
+);
 
 // Rate limiting: Prevents abuse by limiting requests per IP
 const limiter = rateLimit({
@@ -68,11 +70,11 @@ const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    
+
     const allowedOrigins = process.env.CORS_ORIGINS
       ? process.env.CORS_ORIGINS.split(',')
-      : ['http://localhost:3000', 'http://localhost:8001'];
-    
+      : ['http://localhost:3000', 'http://localhost:8000'];
+
     if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
       callback(null, true);
     } else {
