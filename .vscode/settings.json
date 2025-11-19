@@ -8,7 +8,9 @@
   "css.validate": false,
   "scss.validate": false,
   "less.validate": false,
-  "css.customData": [".vscode/css_custom_data.json"],
+  "css.customData": [
+    ".vscode/css_custom_data.json"
+  ],
   "css.languageserver.experimental.customData": true,
   "css.languageserver.experimental.enable": false,
   "css.languageserver.diagnostics.enable": false,
