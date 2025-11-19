@@ -1,6 +1,6 @@
 /**
  * Migration: Create newsletter_subscribers table
- * 
+ *
  * Stores newsletter subscription data:
  * - email: Subscriber email (unique, required)
  * - subscribed_at: Timestamp of subscription
@@ -25,4 +25,3 @@ exports.up = function (knex) {
 exports.down = function (knex) {
   return knex.schema.dropTable('newsletter_subscribers');
 };
-
