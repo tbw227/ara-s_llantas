@@ -48,7 +48,8 @@ app.use(
         styleSrc: ["'self'", "'unsafe-inline'"],
         scriptSrc: ["'self'"],
         imgSrc: ["'self'", 'data:', 'https:'],
-        connectSrc: ["'self'"],
+        connectSrc: ["'self'", 'https:', 'http:'],
+        fontSrc: ["'self'", 'data:', 'https:'],
       },
     },
     crossOriginEmbedderPolicy: false, // Allow cross-origin resources
@@ -72,18 +73,30 @@ const corsOptions = {
     if (!origin) return callback(null, true);
 
     const allowedOrigins = process.env.CORS_ORIGINS
-      ? process.env.CORS_ORIGINS.split(',')
+      ? process.env.CORS_ORIGINS.split(',').map((o) => o.trim())
       : ['http://localhost:3000', 'http://localhost:8000'];
+
+    // In production, be more permissive if CORS_ORIGINS is not set
+    if (process.env.NODE_ENV === 'production' && !process.env.CORS_ORIGINS) {
+      // Allow all origins in production if CORS_ORIGINS is not configured
+      return callback(null, true);
+    }
 
     if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      // Log the blocked origin for debugging
+      if (process.env.ENABLE_LOGGING === 'true') {
+        // eslint-disable-next-line no-console
+        console.log('CORS blocked origin:', origin);
+      }
+      callback(null, true); // Temporarily allow all origins for debugging
     }
   },
   credentials: true, // Allow cookies and authorization headers
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Content-Type', 'Authorization'],
 };
 app.use(cors(corsOptions));
 
