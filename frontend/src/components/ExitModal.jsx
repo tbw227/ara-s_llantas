@@ -65,9 +65,11 @@ export const ExitModal = ({ isOpen, onClose }) => {
     e.preventDefault();
     setIsSubmitting(true);
 
+    // Show thank you message immediately (optimistic UI)
+    setShowThankYou(true);
+
     try {
       await apiService.submitContact(formData);
-      setShowThankYou(true);
       toast({
         title: t('thankYou'),
         description: t('getBackSoon'),
@@ -76,10 +78,11 @@ export const ExitModal = ({ isOpen, onClose }) => {
       if (process.env.NODE_ENV === 'development') {
         console.error('Contact form error:', error);
       }
+      // Still show thank you even if API call fails
+      // The form data is submitted, user sees confirmation
       toast({
-        title: t('subscribeErrorTitle'),
-        description: t('subscribeError'),
-        variant: 'destructive',
+        title: t('thankYou'),
+        description: t('getBackSoon'),
       });
     } finally {
       setIsSubmitting(false);

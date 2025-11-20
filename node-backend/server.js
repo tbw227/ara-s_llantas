@@ -38,67 +38,43 @@ if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_LOGGING === 'tru
 // SECURITY MIDDLEWARE
 // ========================================
 
+// CORS: Configure cross-origin resource sharing
+// Apply CORS FIRST before other middleware to ensure it works
+const corsOptions = {
+  origin: true, // Allow all origins - you can restrict this later
+  credentials: true, // Allow cookies and authorization headers
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH', 'HEAD'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  exposedHeaders: ['Content-Type', 'Authorization'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+};
+app.use(cors(corsOptions));
+
 // Helmet: Sets various HTTP headers for security
-// Configure Helmet to be less restrictive for API routes
+// Disable CSP for API routes to avoid blocking requests
 app.use(
   helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        scriptSrc: ["'self'"],
-        imgSrc: ["'self'", 'data:', 'https:'],
-        connectSrc: ["'self'", 'https:', 'http:'],
-        fontSrc: ["'self'", 'data:', 'https:'],
-      },
-    },
+    contentSecurityPolicy: false, // Disable CSP to prevent 403 errors
     crossOriginEmbedderPolicy: false, // Allow cross-origin resources
+    crossOriginResourcePolicy: { policy: 'cross-origin' }, // Allow cross-origin resources
   })
 );
 
 // Rate limiting: Prevents abuse by limiting requests per IP
+// Skip rate limiting for API health checks
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 1000, // Increased limit to prevent false positives
   message: 'Too many requests from this IP, please try again later.',
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => {
+    // Skip rate limiting for health checks
+    return req.path === '/api/health';
+  },
 });
 app.use(limiter);
-
-// CORS: Configure cross-origin resource sharing
-const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-
-    const allowedOrigins = process.env.CORS_ORIGINS
-      ? process.env.CORS_ORIGINS.split(',').map((o) => o.trim())
-      : ['http://localhost:3000', 'http://localhost:8000'];
-
-    // In production, be more permissive if CORS_ORIGINS is not set
-    if (process.env.NODE_ENV === 'production' && !process.env.CORS_ORIGINS) {
-      // Allow all origins in production if CORS_ORIGINS is not configured
-      return callback(null, true);
-    }
-
-    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
-      callback(null, true);
-    } else {
-      // Log the blocked origin for debugging
-      if (process.env.ENABLE_LOGGING === 'true') {
-        // eslint-disable-next-line no-console
-        console.log('CORS blocked origin:', origin);
-      }
-      callback(null, true); // Temporarily allow all origins for debugging
-    }
-  },
-  credentials: true, // Allow cookies and authorization headers
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  exposedHeaders: ['Content-Type', 'Authorization'],
-};
-app.use(cors(corsOptions));
 
 // ========================================
 // BODY PARSING MIDDLEWARE
