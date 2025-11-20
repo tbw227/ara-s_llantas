@@ -22,7 +22,7 @@ require('dotenv').config();
 
 // Initialize Express application
 const app = express();
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 8001;
 
 // Only log in development or when explicitly enabled
 if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_LOGGING === 'true') {
